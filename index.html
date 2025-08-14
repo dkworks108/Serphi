@@ -3,183 +3,210 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DeepSEO Content Generator</title>
+    <title>DeepSEO Content Generator - Premium</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Custom scrollbar for better aesthetics */
-        ::-webkit-scrollbar {
-            width: 8px;
+        /* --- Base & Animations --- */
+        @keyframes gradient-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        ::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 10px;
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(to bottom right, #e0f2fe, #eef2ff);
+            font-family: 'Manrope', sans-serif;
+            background: linear-gradient(270deg, #111827, #1f2937, #374151);
+            background-size: 200% 200%;
+            animation: gradient-animation 15s ease infinite;
+            color: #e5e7eb; /* Light gray for text */
         }
-        /* Message box styling for notifications */
-        .message-box {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #333;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            z-index: 2100; /* Ensure it's above other elements */
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
+
+        /* --- Scrollbar --- */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1f2937; }
+        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+
+        /* --- Chat UI --- */
+        #chat-container {
+            background-color: rgba(31, 41, 55, 0.8); /* Semi-transparent dark gray */
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease-in-out;
         }
-        .message-box.show {
-            opacity: 1;
-        }
-        /* Styling for the contenteditable area */
-        #output-editor {
-            min-height: 200px;
-            max-height: 600px;
-            overflow-y: auto;
-            border: 1px solid #e2e8f0;
-            border-radius: 0 0 0.375rem 0.375rem;
-            padding: 1.5rem;
-            background-color: #f9fafb;
-            line-height: 1.6;
-            outline: none;
-            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-        }
-        #output-editor:focus {
-            border-color: #6366f1;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-        }
-        /* Editor Controls */
-        #editor-controls-container {
-             border-radius: 0.375rem 0.375rem 0 0;
-        }
-        .editor-btn {
-            @apply p-2 rounded-md bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold text-sm transition duration-150 ease-in-out;
-        }
-        .editor-btn.active {
-            @apply bg-indigo-300;
-        }
-        .color-input {
-            @apply p-1 rounded-md bg-gray-200 cursor-pointer;
-            width: 40px;
-            height: 36px;
-        }
-        /* Modal specific styles */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
-            display: flex; justify-content: center; align-items: center;
-            z-index: 2000; opacity: 0; visibility: hidden;
-            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
-        }
-        .modal-overlay.show {
-            opacity: 1; visibility: visible;
-        }
-        .modal-content {
-            background-color: white; padding: 2rem; border-radius: 0.75rem;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-            max-width: 90%; width: 450px;
-            transform: translateY(-20px); transition: transform 0.3s ease-in-out;
-            position: relative;
-        }
-        .modal-overlay.show .modal-content {
-            transform: translateY(0);
-        }
-        .close-button {
-            position: absolute; top: 10px; right: 10px;
-            background: none; border: none; font-size: 1.5rem;
-            cursor: pointer; color: #666;
-        }
-        .share-option {
-            @apply flex items-center p-3 my-2 rounded-md bg-gray-100 hover:bg-gray-200 transition duration-150 ease-in-out cursor-pointer;
-        }
-        .share-option i {
-            margin-right: 10px; font-size: 1.2rem;
-        }
-        /* NEW CHAT UI STYLES */
         #chat-messages {
             display: flex;
             flex-direction: column;
             gap: 1rem;
         }
+        .user-message, .bot-message {
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
         .user-message {
             align-self: flex-end;
-            background-color: #6366f1; /* indigo-500 */
-            color: white;
-            border-radius: 0.75rem 0.75rem 0 0.75rem;
-            padding: 0.75rem 1rem;
+            background: linear-gradient(to right, #f59e0b, #fbbf24); /* Gold gradient */
+            color: #1f2937; /* Dark text for contrast */
+            border-radius: 1rem 1rem 0.25rem 1rem;
+            padding: 0.75rem 1.25rem;
             max-width: 75%;
             word-wrap: break-word;
+            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.2);
         }
         .bot-message {
             align-self: flex-start;
-            background-color: #f3f4f6; /* gray-100 */
-            color: #1f2937; /* gray-800 */
-            border-radius: 0.75rem 0.75rem 0.75rem 0;
-            padding: 0.75rem 1rem;
+            background-color: #374151; /* Slightly lighter dark gray */
+            color: #e5e7eb;
+            border-radius: 1rem 1rem 1rem 0.25rem;
+            padding: 0.75rem 1.25rem;
             max-width: 75%;
             word-wrap: break-word;
         }
+        #chat-input-area {
+            background-color: transparent;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
         #chat-input {
-            min-height: 24px;
+            color: #e5e7eb;
+            min-height: 28px;
             max-height: 150px;
             overflow-y: auto;
         }
+        #chat-input::placeholder {
+            color: #9ca3af;
+        }
+        #send-btn {
+            background: #f59e0b;
+            color: #1f2937;
+            transition: all 0.3s ease-in-out;
+        }
+        #send-btn:hover {
+            background: #fbbf24;
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+        }
+
+        /* --- Loading Spinner --- */
+        #loading-indicator .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(251, 191, 36, 0.3);
+            border-top-color: #f59e0b;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* --- Output Editor & Controls --- */
+        #lower-section {
+            background-color: rgba(31, 41, 55, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        #output-editor {
+            background-color: #1f2937;
+            border-color: #4b5563;
+            color: #e5e7eb;
+        }
+        #output-editor:focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+        }
+        #editor-controls-container {
+            background-color: #374151;
+            border-color: #4b5563;
+        }
+        .editor-btn {
+            background-color: #4b5563;
+            color: #e5e7eb;
+            transition: all 0.2s ease-in-out;
+        }
+        .editor-btn:hover {
+            background-color: #6b7280;
+        }
+        .editor-btn.active {
+            background-color: #f59e0b;
+            color: #1f2937;
+        }
+        .color-input {
+            background-color: #4b5563;
+        }
+
+        /* --- General Buttons & Modals --- */
+        .premium-btn {
+            @apply font-semibold py-2 px-6 rounded-full shadow-lg transform transition duration-300 ease-in-out focus:outline-none;
+        }
+        .premium-btn-primary {
+            @apply bg-amber-500 hover:bg-amber-400 text-gray-900 focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-gray-800;
+        }
+        .premium-btn-secondary {
+            @apply bg-gray-600 hover:bg-gray-500 text-gray-100 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-800;
+        }
+        .modal-content {
+            background-color: #1f2937;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .close-button {
+            color: #9ca3af;
+        }
+        .close-button:hover {
+            color: #e5e7eb;
+        }
+        .share-option {
+            background-color: #374151;
+            transition: background-color 0.2s ease;
+        }
+        .share-option:hover {
+            background-color: #4b5563;
+        }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800 flex flex-col min-h-screen">
+<body class="text-gray-200 flex flex-col min-h-screen">
     
-    <!-- NEW CHAT INTERFACE STRUCTURE -->
     <div class="container mx-auto p-4 md:p-8 flex-grow flex flex-col">
-        <section id="chat-container" class="bg-white rounded-lg shadow-xl border border-gray-200 flex-grow flex flex-col h-[80vh] max-h-[85vh]">
-            <!-- Chat Header -->
-            <div class="p-4 border-b border-gray-200">
-                <h1 class="text-2xl font-bold text-center text-indigo-700">DeepSEO Chat</h1>
-                <p class="text-center text-sm text-gray-500">Tell me what content you need. For example: "Write a blog post about digital marketing."</p>
+        <section id="chat-container" class="rounded-xl shadow-2xl flex-grow flex flex-col h-[80vh] max-h-[85vh]">
+            <div class="p-4 border-b border-gray-700">
+                <h1 class="text-2xl font-bold text-center text-amber-400">DeepSEO AI</h1>
+                <p class="text-center text-sm text-gray-400 font-light">Describe the content you wish to create.</p>
             </div>
 
-            <!-- Messages Display Area -->
             <div id="chat-messages" class="flex-grow p-6 overflow-y-auto">
-                <!-- Bot's welcome message -->
                 <div class="bot-message">
-                    <p>Hello! I'm the DeepSEO assistant. How can I help you generate content today?</p>
+                    <p>Welcome. I am the DeepSEO AI assistant. How may I assist you today?</p>
                 </div>
             </div>
 
-            <!-- Message Input Area -->
-            <div id="chat-input-area" class="p-4 bg-gray-50 border-t border-gray-200">
-                <div id="loading-indicator" class="hidden text-center text-gray-500 mb-2">
-                    <div class="animate-spin inline-block w-6 h-6 border-4 border-indigo-500 border-t-transparent rounded-full" role="status"></div>
-                    <p class="text-sm mt-1" id="loading-message">Thinking...</p>
+            <div id="chat-input-area" class="p-4">
+                <div id="loading-indicator" class="hidden items-center justify-center text-gray-400 mb-2">
+                    <div class="spinner"></div>
+                    <p class="text-sm ml-3" id="loading-message">Thinking...</p>
                 </div>
-                <div class="flex items-center border border-gray-300 rounded-lg p-2 focus-within:ring-2 focus-within:ring-indigo-500 bg-white">
-                    <textarea id="chat-input" placeholder="Type your content request here..." class="w-full px-2 resize-none border-0 focus:ring-0 bg-transparent" rows="1"></textarea>
-                    <button id="send-btn" class="ml-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transform hover:scale-105 transition duration-300 ease-in-out">
+                <div class="flex items-center border border-gray-600 rounded-lg p-1 focus-within:ring-2 focus-within:ring-amber-500 bg-gray-900/50 transition-all duration-300">
+                    <textarea id="chat-input" placeholder="e.g., Write a persuasive article about the future of renewable energy..." class="w-full px-3 py-2 resize-none border-0 focus:ring-0 bg-transparent" rows="1"></textarea>
+                    <button id="send-btn" class="ml-2 w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-lg shadow-md">
                         <i class="fas fa-paper-plane"></i>
                     </button>
                 </div>
             </div>
         </section>
 
-        <!-- The original output section is now used for displaying and editing the final content -->
-        <section id="lower-section" class="hidden bg-white p-6 md:p-8 rounded-lg shadow-xl border border-gray-200 mt-8">
-            <h2 class="text-2xl md:text-3xl font-bold text-center mb-6 text-indigo-700">Your Generated Content</h2>
+        <section id="lower-section" class="hidden rounded-xl shadow-2xl mt-8">
+            <div class="p-6">
+                <h2 class="text-3xl font-bold text-center mb-6 text-amber-400">Generated Content</h2>
+            </div>
             
             <div id="editor-controls-container" class="hidden">
-                <div class="flex flex-wrap gap-2 p-3 bg-gray-100 rounded-t-md border border-gray-200 border-b-0 mb-0.5">
+                 <div class="flex flex-wrap gap-2 p-3 bg-gray-700/50 border-y border-gray-600">
                     <button type="button" data-command="bold" class="editor-btn" title="Bold"><i class="fas fa-bold"></i></button>
                     <button type="button" data-command="italic" class="editor-btn" title="Italic"><i class="fas fa-italic"></i></button>
                     <button type="button" data-command="underline" class="editor-btn" title="Underline"><i class="fas fa-underline"></i></button>
@@ -187,41 +214,33 @@
                     <button type="button" data-command="formatBlock" data-value="h2" class="editor-btn" title="Heading 2">H2</button>
                     <button type="button" data-command="formatBlock" data-value="h3" class="editor-btn" title="Heading 3">H3</button>
                     <button type="button" data-command="formatBlock" data-value="p" class="editor-btn" title="Paragraph">P</button>
-                    <select id="font-size-select" class="p-2 rounded-md bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold text-sm cursor-pointer" title="Font Size">
+                    <select id="font-size-select" class="editor-btn cursor-pointer" title="Font Size">
                         <option value="">Size</option><option value="1">Small</option><option value="2">Normal</option><option value="3">Medium</option><option value="4">Large</option><option value="5">Larger</option><option value="6">Huge</option><option value="7">Giant</option>
                     </select>
-                    <select id="font-family-select" class="p-2 rounded-md bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold text-sm cursor-pointer" title="Font Family">
-                        <option value="">Font</option><option value="Arial">Arial</option><option value="Verdana">Verdana</option><option value="Times New Roman">Times New Roman</option><option value="Georgia">Georgia</option><option value="Courier New">Courier New</option><option value="Inter, sans-serif">Inter</option>
+                    <select id="font-family-select" class="editor-btn cursor-pointer" title="Font Family">
+                        <option value="">Font</option><option value="Arial">Arial</option><option value="Verdana">Verdana</option><option value="Times New Roman">Times</option><option value="Georgia">Georgia</option><option value="Manrope, sans-serif">Manrope</option>
                     </select>
-                    <input type="color" id="text-color-input" class="color-input" value="#000000" title="Text Color">
-                    <input type="color" id="background-color-input" class="color-input" value="#ffffff" title="Highlight Color">
-                    <button type="button" id="uppercase-btn" class="editor-btn" title="Uppercase Selected Text">Aa <i class="fas fa-arrow-up"></i></button>
-                    <button type="button" id="lowercase-btn" class="editor-btn" title="Lowercase Selected Text">aA <i class="fas fa-arrow-down"></i></button>
-                    <button type="button" data-command="justifyLeft" class="editor-btn" title="Align Left"><i class="fas fa-align-left"></i></button>
-                    <button type="button" data-command="justifyCenter" class="editor-btn" title="Align Center"><i class="fas fa-align-center"></i></button>
-                    <button type="button" data-command="justifyRight" class="editor-btn" title="Align Right"><i class="fas fa-align-right"></i></button>
-                    <button type="button" data-command="justifyFull" class="editor-btn" title="Justify"><i class="fas fa-align-justify"></i></button>
+                    <input type="color" id="text-color-input" class="color-input" value="#e5e7eb" title="Text Color">
+                    <input type="color" id="background-color-input" class="color-input" value="#374151" title="Highlight Color">
                     <button type="button" data-command="insertUnorderedList" class="editor-btn" title="Bullet List"><i class="fas fa-list-ul"></i></button>
                     <button type="button" data-command="insertOrderedList" class="editor-btn" title="Numbered List"><i class="fas fa-list-ol"></i></button>
                     <button type="button" data-command="undo" class="editor-btn" title="Undo"><i class="fas fa-undo"></i></button>
                     <button type="button" data-command="redo" class="editor-btn" title="Redo"><i class="fas fa-redo"></i></button>
                     <button type="button" id="insert-link-btn" class="editor-btn" title="Insert Link"><i class="fas fa-link"></i></button>
-                    <button type="button" id="insert-image-btn" class="editor-btn" title="Insert Image"><i class="fas fa-image"></i></button>
-                    <button type="button" id="insert-table-btn" class="editor-btn" title="Insert Table"><i class="fas fa-table"></i></button>
                 </div>
             </div>
 
             <div id="output-editor" contenteditable="true"></div>
             
-            <div class="flex justify-center gap-4 mt-6">
-                <button id="copy-button" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-6 rounded-full shadow-md transform hover:scale-105 transition duration-300 ease-in-out" style="display: none;" disabled>Copy Text</button>
-                <button id="share-button" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-full shadow-md transform hover:scale-105 transition duration-300 ease-in-out" style="display: none;" disabled>Share</button>
+            <div class="flex justify-center gap-4 p-6">
+                <button id="copy-button" class="premium-btn premium-btn-secondary" style="display: none;" disabled>Copy Text</button>
+                <button id="share-button" class="premium-btn premium-btn-primary" style="display: none;" disabled>Share</button>
             </div>
         </section>
     </div>
 
-    <footer class="bg-gray-800 text-white text-center p-4 mt-auto">
-        <p>&copy; 2025 DeepSEO. All rights reserved.</p>
+    <footer class="text-center p-4 mt-auto text-gray-500 font-light">
+        <p>&copy; 2025 DeepSEO AI. All rights reserved.</p>
     </footer>
 
     <div id="message-box" class="message-box"></div>
@@ -229,18 +248,18 @@
     <div id="share-modal-overlay" class="modal-overlay">
         <div class="modal-content">
             <button id="close-share-modal" class="close-button">&times;</button>
-            <h3 class="text-2xl font-bold text-center mb-6 text-indigo-700">Share Your Content</h3>
+            <h3 class="text-2xl font-bold text-center mb-6 text-amber-400">Share Content</h3>
             <div class="flex flex-col gap-3">
                 <div class="share-option" data-platform="whatsapp"><i class="fab fa-whatsapp text-green-500"></i> Share on WhatsApp</div>
-                <div class="share-option" data-platform="twitter"><i class="fab fa-twitter text-blue-400"></i> Share on Twitter</div>
-                <div class="share-option" data-platform="linkedin"><i class="fab fa-linkedin text-blue-700"></i> Share on LinkedIn</div>
-                <div class="share-option" data-platform="email"><i class="fas fa-envelope text-gray-600"></i> Share via Email</div>
+                <div class="share-option" data-platform="twitter"><i class="fab fa-twitter text-sky-400"></i> Share on X (Twitter)</div>
+                <div class="share-option" data-platform="linkedin"><i class="fab fa-linkedin text-blue-500"></i> Share on LinkedIn</div>
+                <div class="share-option" data-platform="email"><i class="fas fa-envelope text-gray-400"></i> Share via Email</div>
             </div>
         </div>
     </div>
 
     <script type="module">
-        // --- DATA MAPPINGS ---
+        // --- DATA MAPPINGS (Unchanged) ---
         const wordLengthMap = {
             'very-small': { min: 150, max: 300, target: 225 },
             'small': { min: 300, max: 500, target: 400 },
@@ -278,11 +297,7 @@
         const fontFamilySelect = document.getElementById('font-family-select');
         const textColorInput = document.getElementById('text-color-input');
         const backgroundColorInput = document.getElementById('background-color-input');
-        const uppercaseBtn = document.getElementById('uppercase-btn');
-        const lowercaseBtn = document.getElementById('lowercase-btn');
         const insertLinkBtn = document.getElementById('insert-link-btn');
-        const insertImageBtn = document.getElementById('insert-image-btn');
-        const insertTableBtn = document.getElementById('insert-table-btn');
         const shareModalOverlay = document.getElementById('share-modal-overlay');
         const closeShareModalBtn = document.getElementById('close-share-modal');
         const shareOptions = document.querySelectorAll('.share-option');
@@ -300,37 +315,32 @@
         }
         
         function markdownToHtml(markdown) {
-            // This is a simplified Markdown to HTML converter.
-            // It handles headings, bold, links, and paragraphs.
             let html = markdown
                 .replace(/^### (.*$)/gim, '<h3>$1</h3>')
                 .replace(/^## (.*$)/gim, '<h2>$1</h2>')
                 .replace(/^# (.*$)/gim, '<h1>$1</h1>')
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
-                .split('\n\n').map(p => p.trim() ? `<p>${p.replace(/\n/g, '<br>')}</p>` : '').join('');
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-amber-400 hover:underline">$1</a>')
+                .split('\n\n').map(p => p.trim() ? `<p class="my-4">${p.replace(/\n/g, '<br>')}</p>` : '').join('');
             
-            // Clean up paragraphs around block elements
             html = html.replace(/<p><h1>/g, '<h1>').replace(/<\/h1><\/p>/g, '</h1>');
             html = html.replace(/<p><h2>/g, '<h2>').replace(/<\/h2><\/p>/g, '</h2>');
             html = html.replace(/<p><h3>/g, '<h3>').replace(/<\/h3><\/p>/g, '</h3>');
             return html;
         }
 
-
         // --- CHAT & API LOGIC ---
         function displayMessage(text, sender) {
             const messageElement = document.createElement('div');
             messageElement.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
-            // Render basic markdown in bot messages for better readability (e.g., bolding)
-            messageElement.innerHTML = sender === 'bot' ? markdownToHtml(text) : text;
+            messageElement.innerHTML = sender === 'bot' ? markdownToHtml(text) : text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
             chatMessages.appendChild(messageElement);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
         async function callGeminiAPI(prompt, expectJson = false) {
-            // IMPORTANT: The API key is left empty. The Canvas environment will inject it automatically.
-            const apiKey = ""; 
+            const apiKey = "AIzaSyC-nkbK7L2vRtzoRWHLJ3mwsEBBvDxfYjc"; 
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
             
             const payload = {
@@ -353,7 +363,7 @@
 
             const result = await response.json();
             if (!result.candidates || result.candidates.length === 0 || !result.candidates[0].content) {
-                 throw new Error("API returned no content. The prompt may have been blocked due to safety settings.");
+                 throw new Error("API returned no content. The prompt may have been blocked.");
             }
             return result.candidates[0].content.parts[0].text;
         }
@@ -366,39 +376,36 @@
             chatInput.value = '';
             chatInput.style.height = 'auto';
 
-            loadingIndicator.classList.remove('hidden');
+            loadingIndicator.style.display = 'flex';
             sendBtn.disabled = true;
 
             try {
-                loadingMessage.textContent = 'Understanding your request...';
+                loadingMessage.textContent = 'Analyzing request...';
                 const parsingPrompt = `
-                    Analyze the following user request for content generation and extract the parameters into a valid JSON object.
-                    The JSON object must have these keys: "topic", "articleTitle", "wordLength", "contentFormat", "writingStyleTone", "keywords".
-                    - For "wordLength", map it to one of the following: 'very-small', 'small', 'medium', 'large', 'very-large'. If not specified, default to 'medium'.
-                    - For "contentFormat", map it to one of: 'blog', 'article', 'paragraph', 'research-paper', 'product-description', 'social-media-post', 'email-newsletter', 'faq-section'. If not specified, default to 'blog'.
-                    - For "writingStyleTone", map it to one of: 'Informative', 'Conversational', 'Persuasive', 'Narrative', 'Descriptive', 'Technical'. If not specified, default to 'Informative'.
-                    - For "keywords", infer a comma-separated list of 5-7 relevant primary and LSI keywords from the topic.
-
+                    Analyze the user request for content generation and extract parameters into a valid JSON object.
+                    Keys: "topic", "articleTitle", "wordLength", "contentFormat", "writingStyleTone", "keywords".
+                    - "wordLength": map to 'very-small', 'small', 'medium', 'large', 'very-large'. Default: 'medium'.
+                    - "contentFormat": map to 'blog', 'article', 'paragraph', etc. Default: 'blog'.
+                    - "writingStyleTone": map to 'Informative', 'Conversational', etc. Default: 'Informative'.
+                    - "keywords": infer a comma-separated list of 5-7 keywords.
                     User Request: "${userInput}"
-
                     JSON Output:`;
 
                 const parsedParamsJson = await callGeminiAPI(parsingPrompt, true);
                 const contentOptions = JSON.parse(parsedParamsJson);
 
-                loadingMessage.textContent = 'Generating your content...';
+                loadingMessage.textContent = 'Crafting content...';
                 await generateFinalContent(contentOptions);
             } catch (error) {
                 console.error("Chat handling error:", error);
-                displayMessage(`I'm sorry, I encountered an error. Please try rephrasing your request. (Error: ${error.message})`, 'bot');
+                displayMessage(`An error occurred. Please try rephrasing your request. (Details: ${error.message})`, 'bot');
             } finally {
-                loadingIndicator.classList.add('hidden');
+                loadingIndicator.style.display = 'none';
                 sendBtn.disabled = false;
             }
         }
 
         async function generateFinalContent(options) {
-            // Reset the output section
             outputEditor.innerHTML = '';
             editorControlsContainer.classList.add('hidden');
             lowerSection.classList.add('hidden');
@@ -409,36 +416,34 @@
             const wordLimitInfo = wordLengthMap[wordLength];
             const styleToneInfo = writingStyleToneMap.get(writingStyleTone);
             
-            const promptContent = `As a skilled human content editor and SEO specialist, generate exceptional, unique, and human-like content for a webpage.
+            const promptContent = `As a world-class content strategist and SEO expert, generate exceptional, unique, and human-like content.
                 **Content Requirements:**
-                - **Topic/Information:** "${topic}"
+                - **Topic:** "${topic}"
                 ${articleTitle ? `- **Main Article Title (H1):** "${articleTitle}"` : ''}
-                - **Approximate Word Count:** Generate content around ${wordLimitInfo.target} words.
-                - **Keywords (Primary & LSI):** Integrate "${keywords}" naturally.
-                - **Content Format:** Structure as a "${contentFormat}".
-                - **Writing Style & Tone:** Adopt a "${writingStyleTone}" tone. Use this structure: ${styleToneInfo.structure}.
-                - **Paragraphs:** Keep paragraphs short (2-3 lines). Use active voice.
-                **Formatting & Output:**
-                - **Output Format:** Strictly format the entire output in **Markdown**. Use Markdown for headings, paragraphs, bolding, lists, and links.
-                - **Meta Description:** At the very end of the content, include a compelling meta description (150-160 characters), clearly labeled "Meta Description:".
+                - **Word Count:** Around ${wordLimitInfo.target} words.
+                - **Keywords:** Integrate "${keywords}" naturally.
+                - **Format:** Structure as a "${contentFormat}".
+                - **Style & Tone:** Adopt a "${writingStyleTone}" tone. Use this structure: ${styleToneInfo.structure}.
+                - **Paragraphs:** Keep paragraphs concise (2-4 lines). Use active voice.
+                **Output Format:**
+                - **Format:** Strictly use **Markdown**. Use headings, paragraphs, bolding, lists, and links.
+                - **Meta Description:** At the end, include a compelling meta description (150-160 characters), labeled "Meta Description:".
             `;
 
-            displayMessage(`Got it! I'm creating a **${wordLength}** **${contentFormat}** about "**${topic}**" with a **${writingStyleTone}** tone. This might take a moment...`, 'bot');
+            displayMessage(`Understood. I am now crafting a **${wordLength}** **${contentFormat}** about "**${topic}**" with a **${writingStyleTone}** tone. This may take a moment.`, 'bot');
 
             const finalMarkdown = await callGeminiAPI(promptContent);
 
-            // Display final content
             outputEditor.innerHTML = markdownToHtml(finalMarkdown);
             lowerSection.classList.remove('hidden');
             editorControlsContainer.classList.remove('hidden');
 
-            // Enable action buttons
             copyButton.disabled = false;
             shareButton.disabled = false;
             copyButton.style.display = 'inline-block';
             shareButton.style.display = 'inline-block';
 
-            displayMessage("Your content is ready! You can review and edit it below.", 'bot');
+            displayMessage("Your content is ready for review below.", 'bot');
         }
 
         // --- EVENT LISTENERS SETUP ---
@@ -455,7 +460,6 @@
                 chatInput.style.height = `${chatInput.scrollHeight}px`;
             });
 
-            // Editor buttons
             editorButtons.forEach(button => {
                 button.addEventListener('click', () => {
                     executeCommand(button.dataset.command, button.dataset.value);
@@ -466,67 +470,15 @@
             textColorInput.addEventListener('input', (e) => executeCommand('foreColor', e.target.value));
             backgroundColorInput.addEventListener('input', (e) => executeCommand('backColor', e.target.value));
             
-            const transformText = (transformFn) => {
-                const selection = window.getSelection();
-                if (!selection.rangeCount || selection.isCollapsed) return;
-                const range = selection.getRangeAt(0);
-                const selectedText = range.toString();
-                if (selectedText) {
-                    range.deleteContents();
-                    range.insertNode(document.createTextNode(transformFn(selectedText)));
-                }
-            };
-            uppercaseBtn.addEventListener('click', () => transformText(s => s.toUpperCase()));
-            lowercaseBtn.addEventListener('click', () => transformText(s => s.toLowerCase()));
-            
             insertLinkBtn.addEventListener('click', () => {
                 const url = prompt('Enter the URL:');
                 if (url) executeCommand('createLink', url);
             });
-            insertImageBtn.addEventListener('click', () => {
-                const url = prompt('Enter the image URL:');
-                if(url) {
-                    const alt = prompt('Enter alt text for the image:', '');
-                    executeCommand('insertHTML', `<img src="${url}" alt="${alt}" style="max-width:100%; height:auto; border-radius: 8px;">`);
-                }
-            });
-            insertTableBtn.addEventListener('click', () => {
-                const rows = prompt('Enter number of rows:', '3');
-                const cols = prompt('Enter number of columns:', '3');
-                if(rows && cols && !isNaN(rows) && !isNaN(cols)){
-                    let table = '<table style="width:100%; border-collapse: collapse;"><tbody>';
-                    for(let r=0; r<parseInt(rows); r++){
-                        table += '<tr>';
-                        for(let c=0; c<parseInt(cols); c++){
-                            table += '<td style="border: 1px solid #ccc; padding: 8px;">Cell</td>';
-                        }
-                        table += '</tr>';
-                    }
-                    table += '</tbody></table>';
-                    executeCommand('insertHTML', table);
-                }
-            });
 
-            // Copy and Share
             copyButton.addEventListener('click', () => {
-                // Use the Clipboard API for modern browsers
                 navigator.clipboard.writeText(outputEditor.innerText).then(() => {
                     showMessage('Content copied to clipboard!');
-                }, () => {
-                    // Fallback for older browsers
-                    try {
-                        const range = document.createRange();
-                        range.selectNodeContents(outputEditor);
-                        const selection = window.getSelection();
-                        selection.removeAllRanges();
-                        selection.addRange(range);
-                        document.execCommand('copy');
-                        selection.removeAllRanges();
-                        showMessage('Content copied to clipboard!');
-                    } catch (err) {
-                       showMessage('Failed to copy content.');
-                    }
-                });
+                }, () => showMessage('Failed to copy content.'));
             });
             shareButton.addEventListener('click', () => shareModalOverlay.classList.add('show'));
             closeShareModalBtn.addEventListener('click', () => shareModalOverlay.classList.remove('show'));
@@ -553,11 +505,7 @@
             });
         }
         
-        // --- INITIALIZATION ---
-        window.onload = () => {
-            setupEventListeners();
-        };
-
+        window.onload = setupEventListeners;
     </script>
 </body>
 </html>
