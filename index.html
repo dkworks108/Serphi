@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepSEO Content Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to bottom right, #e0f2fe, #eef2ff);
+        }
+        /* Message box styling for notifications */
+        .message-box {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 2100; /* Ensure it's above other elements */
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .message-box.show {
+            opacity: 1;
+        }
+        /* Styling for the contenteditable area */
+        #output-editor {
+            min-height: 200px;
+            max-height: 600px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 0 0 0.375rem 0.375rem;
+            padding: 1.5rem;
+            background-color: #f9fafb;
+            line-height: 1.6;
+            outline: none;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        #output-editor:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+        /* Editor Controls */
+        #editor-controls-container {
+             border-radius: 0.375rem 0.375rem 0 0;
+        }
+        .editor-btn {
+            @apply p-2 rounded-md bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold text-sm transition duration-150 ease-in-out;
+        }
+        .editor-btn.active {
+            @apply bg-indigo-300;
+        }
+        .color-input {
+            @apply p-1 rounded-md bg-gray-200 cursor-pointer;
+            width: 40px;
+            height: 36px;
+        }
+        /* Modal specific styles */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 2000; opacity: 0; visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        .modal-overlay.show {
+            opacity: 1; visibility: visible;
+        }
+        .modal-content {
+            background-color: white; padding: 2rem; border-radius: 0.75rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            max-width: 90%; width: 450px;
+            transform: translateY(-20px); transition: transform 0.3s ease-in-out;
+            position: relative;
+        }
+        .modal-overlay.show .modal-content {
+            transform: translateY(0);
+        }
+        .close-button {
+            position: absolute; top: 10px; right: 10px;
+            background: none; border: none; font-size: 1.5rem;
+            cursor: pointer; color: #666;
+        }
+        .share-option {
+            @apply flex items-center p-3 my-2 rounded-md bg-gray-100 hover:bg-gray-200 transition duration-150 ease-in-out cursor-pointer;
+        }
+        .share-option i {
+            margin-right: 10px; font-size: 1.2rem;
+        }
+        /* NEW CHAT UI STYLES */
+        #chat-messages {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .user-message {
+            align-self: flex-end;
+            background-color: #6366f1; /* indigo-500 */
+            color: white;
+            border-radius: 0.75rem 0.75rem 0 0.75rem;
+            padding: 0.75rem 1rem;
+            max-width: 75%;
+            word-wrap: break-word;
+        }
+        .bot-message {
+            align-self: flex-start;
+            background-color: #f3f4f6; /* gray-100 */
+            color: #1f2937; /* gray-800 */
+            border-radius: 0.75rem 0.75rem 0.75rem 0;
+            padding: 0.75rem 1rem;
+            max-width: 75%;
+            word-wrap: break-word;
+        }
+        #chat-input {
+            min-height: 24px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 flex flex-col min-h-screen">
+    
+    <!-- NEW CHAT INTERFACE STRUCTURE -->
+    <div class="container mx-auto p-4 md:p-8 flex-grow flex flex-col">
+        <section id="chat-container" class="bg-white rounded-lg shadow-xl border border-gray-200 flex-grow flex flex-col h-[80vh] max-h-[85vh]">
+            <!-- Chat Header -->
+            <div class="p-4 border-b border-gray-200">
+                <h1 class="text-2xl font-bold text-center text-indigo-700">DeepSEO Chat</h1>
+                <p class="text-center text-sm text-gray-500">Tell me what content you need. For example: "Write a blog post about digital marketing."</p>
+            </div>
+
+            <!-- Messages Display Area -->
+            <div id="chat-messages" class="flex-grow p-6 overflow-y-auto">
+                <!-- Bot's welcome message -->
+                <div class="bot-message">
+                    <p>Hello! I'm the DeepSEO assistant. How can I help you generate content today?</p>
+                </div>
+            </div>
+
+            <!-- Message Input Area -->
+            <div id="chat-input-area" class="p-4 bg-gray-50 border-t border-gray-200">
+                <div id="loading-indicator" class="hidden text-center text-gray-500 mb-2">
+                    <div class="animate-spin inline-block w-6 h-6 border-4 border-indigo-500 border-t-transparent rounded-full" role="status"></div>
+                    <p class="text-sm mt-1" id="loading-message">Thinking...</p>
+                </div>
+                <div class="flex items-center border border-gray-300 rounded-lg p-2 focus-within:ring-2 focus-within:ring-indigo-500 bg-white">
+                    <textarea id="chat-input" placeholder="Type your content request here..." class="w-full px-2 resize-none border-0 focus:ring-0 bg-transparent" rows="1"></textarea>
+                    <button id="send-btn" class="ml-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transform hover:scale-105 transition duration-300 ease-in-out">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- The original output section is now used for displaying and editing the final content -->
+        <section id="lower-section" class="hidden bg-white p-6 md:p-8 rounded-lg shadow-xl border border-gray-200 mt-8">
+            <h2 class="text-2xl md:text-3xl font-bold text-center mb-6 text-indigo-700">Your Generated Content</h2>
+            
+            <div id="editor-controls-container" class="hidden">
+                <div class="flex flex-wrap gap-2 p-3 bg-gray-100 rounded-t-md border border-gray-200 border-b-0 mb-0.5">
+                    <button type="button" data-command="bold" class="editor-btn" title="Bold"><i class="fas fa-bold"></i></button>
+                    <button type="button" data-command="italic" class="editor-btn" title="Italic"><i class="fas fa-italic"></i></button>
+                    <button type="button" data-command="underline" class="editor-btn" title="Underline"><i class="fas fa-underline"></i></button>
+                    <button type="button" data-command="strikeThrough" class="editor-btn" title="Strikethrough"><i class="fas fa-strikethrough"></i></button>
+                    <button type="button" data-command="formatBlock" data-value="h2" class="editor-btn" title="Heading 2">H2</button>
+                    <button type="button" data-command="formatBlock" data-value="h3" class="editor-btn" title="Heading 3">H3</button>
+                    <button type="button" data-command="formatBlock" data-value="p" class="editor-btn" title="Paragraph">P</button>
+                    <select id="font-size-select" class="p-2 rounded-md bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold text-sm cursor-pointer" title="Font Size">
+                        <option value="">Size</option><option value="1">Small</option><option value="2">Normal</option><option value="3">Medium</option><option value="4">Large</option><option value="5">Larger</option><option value="6">Huge</option><option value="7">Giant</option>
+                    </select>
+                    <select id="font-family-select" class="p-2 rounded-md bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold text-sm cursor-pointer" title="Font Family">
+                        <option value="">Font</option><option value="Arial">Arial</option><option value="Verdana">Verdana</option><option value="Times New Roman">Times New Roman</option><option value="Georgia">Georgia</option><option value="Courier New">Courier New</option><option value="Inter, sans-serif">Inter</option>
+                    </select>
+                    <input type="color" id="text-color-input" class="color-input" value="#000000" title="Text Color">
+                    <input type="color" id="background-color-input" class="color-input" value="#ffffff" title="Highlight Color">
+                    <button type="button" id="uppercase-btn" class="editor-btn" title="Uppercase Selected Text">Aa <i class="fas fa-arrow-up"></i></button>
+                    <button type="button" id="lowercase-btn" class="editor-btn" title="Lowercase Selected Text">aA <i class="fas fa-arrow-down"></i></button>
+                    <button type="button" data-command="justifyLeft" class="editor-btn" title="Align Left"><i class="fas fa-align-left"></i></button>
+                    <button type="button" data-command="justifyCenter" class="editor-btn" title="Align Center"><i class="fas fa-align-center"></i></button>
+                    <button type="button" data-command="justifyRight" class="editor-btn" title="Align Right"><i class="fas fa-align-right"></i></button>
+                    <button type="button" data-command="justifyFull" class="editor-btn" title="Justify"><i class="fas fa-align-justify"></i></button>
+                    <button type="button" data-command="insertUnorderedList" class="editor-btn" title="Bullet List"><i class="fas fa-list-ul"></i></button>
+                    <button type="button" data-command="insertOrderedList" class="editor-btn" title="Numbered List"><i class="fas fa-list-ol"></i></button>
+                    <button type="button" data-command="undo" class="editor-btn" title="Undo"><i class="fas fa-undo"></i></button>
+                    <button type="button" data-command="redo" class="editor-btn" title="Redo"><i class="fas fa-redo"></i></button>
+                    <button type="button" id="insert-link-btn" class="editor-btn" title="Insert Link"><i class="fas fa-link"></i></button>
+                    <button type="button" id="insert-image-btn" class="editor-btn" title="Insert Image"><i class="fas fa-image"></i></button>
+                    <button type="button" id="insert-table-btn" class="editor-btn" title="Insert Table"><i class="fas fa-table"></i></button>
+                </div>
+            </div>
+
+            <div id="output-editor" contenteditable="true"></div>
+            
+            <div class="flex justify-center gap-4 mt-6">
+                <button id="copy-button" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-6 rounded-full shadow-md transform hover:scale-105 transition duration-300 ease-in-out" style="display: none;" disabled>Copy Text</button>
+                <button id="share-button" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-full shadow-md transform hover:scale-105 transition duration-300 ease-in-out" style="display: none;" disabled>Share</button>
+            </div>
+        </section>
+    </div>
+
+    <footer class="bg-gray-800 text-white text-center p-4 mt-auto">
+        <p>&copy; 2025 DeepSEO. All rights reserved.</p>
+    </footer>
+
+    <div id="message-box" class="message-box"></div>
+
+    <div id="share-modal-overlay" class="modal-overlay">
+        <div class="modal-content">
+            <button id="close-share-modal" class="close-button">&times;</button>
+            <h3 class="text-2xl font-bold text-center mb-6 text-indigo-700">Share Your Content</h3>
+            <div class="flex flex-col gap-3">
+                <div class="share-option" data-platform="whatsapp"><i class="fab fa-whatsapp text-green-500"></i> Share on WhatsApp</div>
+                <div class="share-option" data-platform="twitter"><i class="fab fa-twitter text-blue-400"></i> Share on Twitter</div>
+                <div class="share-option" data-platform="linkedin"><i class="fab fa-linkedin text-blue-700"></i> Share on LinkedIn</div>
+                <div class="share-option" data-platform="email"><i class="fas fa-envelope text-gray-600"></i> Share via Email</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // --- DATA MAPPINGS ---
+        const wordLengthMap = {
+            'very-small': { min: 150, max: 300, target: 225 },
+            'small': { min: 300, max: 500, target: 400 },
+            'medium': { min: 500, max: 800, target: 650 },
+            'large': { min: 800, max: 1500, target: 1200 },
+            'very-large': { min: 1500, max: 2500, target: 2000 }
+        };
+        const writingStyleToneMap = new Map([
+            ['Informative', { description: 'Provides useful, factual content; objective tone.', structure: 'Title → Introduction → Subheadings → Bullet Points/Lists → Conclusion/CTA' }],
+            ['Conversational', { description: 'Friendly, casual, human-sounding writing.', structure: 'Hook → Story or Question → Main Points → Light Humor/Examples → CTA' }],
+            ['Educational', { description: 'Designed to teach or explain something step-by-step.', structure: 'Definition → Explanation → Examples → Summary/Exercise/Quiz' }],
+            ['Formal/Professional', { description: 'Objective, structured, business-like.', structure: 'Executive Summary → Sections → Data/Stats → Formal Conclusion' }],
+            ['Persuasive', { description: 'Tries to influence or convince the reader.', structure: 'Problem → Agitate → Solution → Benefits → CTA' }],
+            ['Narrative', { description: 'Tells a story; often personal or brand-driven.', structure: 'Setup → Conflict → Resolution → Moral/CTA' }],
+            ['Descriptive', { description: 'Focuses on detailed imagery or descriptions.', structure: 'Sensory Language → Metaphors → Features → Emotional Hook' }],
+            ['Analytical', { description: 'Breaks down data or trends with reasoning.', structure: 'Thesis → Evidence → Breakdown → Conclusion' }],
+            ['Technical', { description: 'Precise, jargon-heavy, instructional tone.', structure: 'Introduction → Requirements → Step-by-Step Instructions → Troubleshooting' }],
+            ['Expository', { description: 'Explains concepts or ideas neutrally.', structure: 'Topic → Clear Definitions → Logical Sections → Summary' }]
+        ]);
+
+        // --- DOM ELEMENT REFERENCES ---
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('send-btn');
+        const lowerSection = document.getElementById('lower-section');
+        const outputEditor = document.getElementById('output-editor');
+        const editorControlsContainer = document.getElementById('editor-controls-container');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const loadingMessage = document.getElementById('loading-message');
+        const copyButton = document.getElementById('copy-button');
+        const shareButton = document.getElementById('share-button');
+        const messageBox = document.getElementById('message-box');
+        const editorButtons = document.querySelectorAll('.editor-btn[data-command]');
+        const fontSizeSelect = document.getElementById('font-size-select');
+        const fontFamilySelect = document.getElementById('font-family-select');
+        const textColorInput = document.getElementById('text-color-input');
+        const backgroundColorInput = document.getElementById('background-color-input');
+        const uppercaseBtn = document.getElementById('uppercase-btn');
+        const lowercaseBtn = document.getElementById('lowercase-btn');
+        const insertLinkBtn = document.getElementById('insert-link-btn');
+        const insertImageBtn = document.getElementById('insert-image-btn');
+        const insertTableBtn = document.getElementById('insert-table-btn');
+        const shareModalOverlay = document.getElementById('share-modal-overlay');
+        const closeShareModalBtn = document.getElementById('close-share-modal');
+        const shareOptions = document.querySelectorAll('.share-option');
+
+        // --- HELPER FUNCTIONS ---
+        function showMessage(message, duration = 3000) {
+            messageBox.textContent = message;
+            messageBox.classList.add('show');
+            setTimeout(() => { messageBox.classList.remove('show'); }, duration);
+        }
+
+        function executeCommand(command, value = null) {
+            document.execCommand(command, false, value);
+            outputEditor.focus();
+        }
+        
+        function markdownToHtml(markdown) {
+            // This is a simplified Markdown to HTML converter.
+            // It handles headings, bold, links, and paragraphs.
+            let html = markdown
+                .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+                .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+                .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+                .split('\n\n').map(p => p.trim() ? `<p>${p.replace(/\n/g, '<br>')}</p>` : '').join('');
+            
+            // Clean up paragraphs around block elements
+            html = html.replace(/<p><h1>/g, '<h1>').replace(/<\/h1><\/p>/g, '</h1>');
+            html = html.replace(/<p><h2>/g, '<h2>').replace(/<\/h2><\/p>/g, '</h2>');
+            html = html.replace(/<p><h3>/g, '<h3>').replace(/<\/h3><\/p>/g, '</h3>');
+            return html;
+        }
+
+
+        // --- CHAT & API LOGIC ---
+        function displayMessage(text, sender) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
+            // Render basic markdown in bot messages for better readability (e.g., bolding)
+            messageElement.innerHTML = sender === 'bot' ? markdownToHtml(text) : text;
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        async function callGeminiAPI(prompt, expectJson = false) {
+            // IMPORTANT: The API key is left empty. The Canvas environment will inject it automatically.
+            const apiKey = ""; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{ role: "user", parts: [{ text: prompt }] }]
+            };
+            if (expectJson) {
+                payload.generationConfig = { "response_mime_type": "application/json" };
+            }
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errorBody = await response.text();
+                throw new Error(`API call failed with status ${response.status}: ${errorBody}`);
+            }
+
+            const result = await response.json();
+            if (!result.candidates || result.candidates.length === 0 || !result.candidates[0].content) {
+                 throw new Error("API returned no content. The prompt may have been blocked due to safety settings.");
+            }
+            return result.candidates[0].content.parts[0].text;
+        }
+
+        async function handleUserMessage() {
+            const userInput = chatInput.value.trim();
+            if (!userInput) return;
+
+            displayMessage(userInput, 'user');
+            chatInput.value = '';
+            chatInput.style.height = 'auto';
+
+            loadingIndicator.classList.remove('hidden');
+            sendBtn.disabled = true;
+
+            try {
+                loadingMessage.textContent = 'Understanding your request...';
+                const parsingPrompt = `
+                    Analyze the following user request for content generation and extract the parameters into a valid JSON object.
+                    The JSON object must have these keys: "topic", "articleTitle", "wordLength", "contentFormat", "writingStyleTone", "keywords".
+                    - For "wordLength", map it to one of the following: 'very-small', 'small', 'medium', 'large', 'very-large'. If not specified, default to 'medium'.
+                    - For "contentFormat", map it to one of: 'blog', 'article', 'paragraph', 'research-paper', 'product-description', 'social-media-post', 'email-newsletter', 'faq-section'. If not specified, default to 'blog'.
+                    - For "writingStyleTone", map it to one of: 'Informative', 'Conversational', 'Persuasive', 'Narrative', 'Descriptive', 'Technical'. If not specified, default to 'Informative'.
+                    - For "keywords", infer a comma-separated list of 5-7 relevant primary and LSI keywords from the topic.
+
+                    User Request: "${userInput}"
+
+                    JSON Output:`;
+
+                const parsedParamsJson = await callGeminiAPI(parsingPrompt, true);
+                const contentOptions = JSON.parse(parsedParamsJson);
+
+                loadingMessage.textContent = 'Generating your content...';
+                await generateFinalContent(contentOptions);
+            } catch (error) {
+                console.error("Chat handling error:", error);
+                displayMessage(`I'm sorry, I encountered an error. Please try rephrasing your request. (Error: ${error.message})`, 'bot');
+            } finally {
+                loadingIndicator.classList.add('hidden');
+                sendBtn.disabled = false;
+            }
+        }
+
+        async function generateFinalContent(options) {
+            // Reset the output section
+            outputEditor.innerHTML = '';
+            editorControlsContainer.classList.add('hidden');
+            lowerSection.classList.add('hidden');
+            copyButton.style.display = 'none';
+            shareButton.style.display = 'none';
+            
+            const { topic = "Not specified", articleTitle = "", wordLength = "medium", contentFormat = "blog", writingStyleTone = "Informative", keywords = "" } = options;
+            const wordLimitInfo = wordLengthMap[wordLength];
+            const styleToneInfo = writingStyleToneMap.get(writingStyleTone);
+            
+            const promptContent = `As a skilled human content editor and SEO specialist, generate exceptional, unique, and human-like content for a webpage.
+                **Content Requirements:**
+                - **Topic/Information:** "${topic}"
+                ${articleTitle ? `- **Main Article Title (H1):** "${articleTitle}"` : ''}
+                - **Approximate Word Count:** Generate content around ${wordLimitInfo.target} words.
+                - **Keywords (Primary & LSI):** Integrate "${keywords}" naturally.
+                - **Content Format:** Structure as a "${contentFormat}".
+                - **Writing Style & Tone:** Adopt a "${writingStyleTone}" tone. Use this structure: ${styleToneInfo.structure}.
+                - **Paragraphs:** Keep paragraphs short (2-3 lines). Use active voice.
+                **Formatting & Output:**
+                - **Output Format:** Strictly format the entire output in **Markdown**. Use Markdown for headings, paragraphs, bolding, lists, and links.
+                - **Meta Description:** At the very end of the content, include a compelling meta description (150-160 characters), clearly labeled "Meta Description:".
+            `;
+
+            displayMessage(`Got it! I'm creating a **${wordLength}** **${contentFormat}** about "**${topic}**" with a **${writingStyleTone}** tone. This might take a moment...`, 'bot');
+
+            const finalMarkdown = await callGeminiAPI(promptContent);
+
+            // Display final content
+            outputEditor.innerHTML = markdownToHtml(finalMarkdown);
+            lowerSection.classList.remove('hidden');
+            editorControlsContainer.classList.remove('hidden');
+
+            // Enable action buttons
+            copyButton.disabled = false;
+            shareButton.disabled = false;
+            copyButton.style.display = 'inline-block';
+            shareButton.style.display = 'inline-block';
+
+            displayMessage("Your content is ready! You can review and edit it below.", 'bot');
+        }
+
+        // --- EVENT LISTENERS SETUP ---
+        function setupEventListeners() {
+            sendBtn.addEventListener('click', handleUserMessage);
+            chatInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleUserMessage();
+                }
+            });
+            chatInput.addEventListener('input', () => {
+                chatInput.style.height = 'auto';
+                chatInput.style.height = `${chatInput.scrollHeight}px`;
+            });
+
+            // Editor buttons
+            editorButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    executeCommand(button.dataset.command, button.dataset.value);
+                });
+            });
+            fontSizeSelect.addEventListener('change', (e) => e.target.value && executeCommand('fontSize', e.target.value));
+            fontFamilySelect.addEventListener('change', (e) => e.target.value && executeCommand('fontName', e.target.value));
+            textColorInput.addEventListener('input', (e) => executeCommand('foreColor', e.target.value));
+            backgroundColorInput.addEventListener('input', (e) => executeCommand('backColor', e.target.value));
+            
+            const transformText = (transformFn) => {
+                const selection = window.getSelection();
+                if (!selection.rangeCount || selection.isCollapsed) return;
+                const range = selection.getRangeAt(0);
+                const selectedText = range.toString();
+                if (selectedText) {
+                    range.deleteContents();
+                    range.insertNode(document.createTextNode(transformFn(selectedText)));
+                }
+            };
+            uppercaseBtn.addEventListener('click', () => transformText(s => s.toUpperCase()));
+            lowercaseBtn.addEventListener('click', () => transformText(s => s.toLowerCase()));
+            
+            insertLinkBtn.addEventListener('click', () => {
+                const url = prompt('Enter the URL:');
+                if (url) executeCommand('createLink', url);
+            });
+            insertImageBtn.addEventListener('click', () => {
+                const url = prompt('Enter the image URL:');
+                if(url) {
+                    const alt = prompt('Enter alt text for the image:', '');
+                    executeCommand('insertHTML', `<img src="${url}" alt="${alt}" style="max-width:100%; height:auto; border-radius: 8px;">`);
+                }
+            });
+            insertTableBtn.addEventListener('click', () => {
+                const rows = prompt('Enter number of rows:', '3');
+                const cols = prompt('Enter number of columns:', '3');
+                if(rows && cols && !isNaN(rows) && !isNaN(cols)){
+                    let table = '<table style="width:100%; border-collapse: collapse;"><tbody>';
+                    for(let r=0; r<parseInt(rows); r++){
+                        table += '<tr>';
+                        for(let c=0; c<parseInt(cols); c++){
+                            table += '<td style="border: 1px solid #ccc; padding: 8px;">Cell</td>';
+                        }
+                        table += '</tr>';
+                    }
+                    table += '</tbody></table>';
+                    executeCommand('insertHTML', table);
+                }
+            });
+
+            // Copy and Share
+            copyButton.addEventListener('click', () => {
+                // Use the Clipboard API for modern browsers
+                navigator.clipboard.writeText(outputEditor.innerText).then(() => {
+                    showMessage('Content copied to clipboard!');
+                }, () => {
+                    // Fallback for older browsers
+                    try {
+                        const range = document.createRange();
+                        range.selectNodeContents(outputEditor);
+                        const selection = window.getSelection();
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                        document.execCommand('copy');
+                        selection.removeAllRanges();
+                        showMessage('Content copied to clipboard!');
+                    } catch (err) {
+                       showMessage('Failed to copy content.');
+                    }
+                });
+            });
+            shareButton.addEventListener('click', () => shareModalOverlay.classList.add('show'));
+            closeShareModalBtn.addEventListener('click', () => shareModalOverlay.classList.remove('show'));
+            shareModalOverlay.addEventListener('click', (e) => {
+                if(e.target === shareModalOverlay) shareModalOverlay.classList.remove('show');
+            });
+            shareOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    const platform = option.dataset.platform;
+                    const content = outputEditor.innerText;
+                    const pageUrl = window.location.href;
+                    const shareText = encodeURIComponent(`Check out this DeepSEO content: ${content.substring(0, 150)}... \n\n${pageUrl}`);
+                    const shareTitle = encodeURIComponent("DeepSEO Generated Content");
+                    let url = '';
+                    switch(platform){
+                        case 'whatsapp': url = `https://api.whatsapp.com/send?text=${shareText}`; break;
+                        case 'twitter': url = `https://twitter.com/intent/tweet?text=${shareText}`; break;
+                        case 'linkedin': url = `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(pageUrl)}&title=${shareTitle}&summary=${shareText}`; break;
+                        case 'email': url = `mailto:?subject=${shareTitle}&body=${shareText}`; break;
+                    }
+                    if(url) window.open(url, '_blank');
+                    shareModalOverlay.classList.remove('show');
+                });
+            });
+        }
+        
+        // --- INITIALIZATION ---
+        window.onload = () => {
+            setupEventListeners();
+        };
+
+    </script>
+</body>
+</html>
