@@ -3,509 +3,766 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DeepSEO Content Generator - Premium</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Serphi AI - Humanized Content Creation</title>
     <style>
-        /* --- Base & Animations --- */
-        @keyframes gradient-animation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: 'Manrope', sans-serif;
-            background: linear-gradient(270deg, #111827, #1f2937, #374151);
-            background-size: 200% 200%;
-            animation: gradient-animation 15s ease infinite;
-            color: #e5e7eb; /* Light gray for text */
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #ffffff;
+            overflow-x: hidden;
         }
 
-        /* --- Scrollbar --- */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #1f2937; }
-        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
-
-        /* --- Chat UI --- */
-        #chat-container {
-            background-color: rgba(31, 41, 55, 0.8); /* Semi-transparent dark gray */
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease-in-out;
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 50px;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 162, 255, 0.2);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        #chat-messages {
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(45deg, #00a2ff, #0078d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(0, 162, 255, 0.5);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-item {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            color: #00a2ff;
+            text-shadow: 0 0 20px rgba(0, 162, 255, 0.6);
+        }
+
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #00a2ff, #0078d4);
+            transition: width 0.3s ease;
+        }
+
+        .nav-item:hover::after {
+            width: 100%;
+        }
+
+        /* Main Content */
+        .main-container {
+            scroll-snap-type: y mandatory;
+            height: 100vh;
+            overflow-y: scroll;
+        }
+
+        .section {
+            scroll-snap-align: start;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+            padding: 100px 50px 50px;
         }
-        .user-message, .bot-message {
-            animation: fadeIn 0.5s ease-in-out forwards;
+
+        /* Hero Section */
+        .hero-section {
+            background: radial-gradient(ellipse at center, rgba(0, 162, 255, 0.1) 0%, transparent 70%);
+            text-align: center;
         }
-        .user-message {
-            align-self: flex-end;
-            background: linear-gradient(to right, #f59e0b, #fbbf24); /* Gold gradient */
-            color: #1f2937; /* Dark text for contrast */
-            border-radius: 1rem 1rem 0.25rem 1rem;
-            padding: 0.75rem 1.25rem;
-            max-width: 75%;
-            word-wrap: break-word;
-            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.2);
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #ffffff, #00a2ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
         }
-        .bot-message {
-            align-self: flex-start;
-            background-color: #374151; /* Slightly lighter dark gray */
-            color: #e5e7eb;
-            border-radius: 1rem 1rem 1rem 0.25rem;
-            padding: 0.75rem 1.25rem;
-            max-width: 75%;
-            word-wrap: break-word;
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: #b0b0b0;
+            margin-bottom: 30px;
+            max-width: 800px;
+            line-height: 1.6;
         }
-        #chat-input-area {
-            background-color: transparent;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+        .hero-description {
+            font-size: 1.1rem;
+            color: #888;
+            max-width: 600px;
+            line-height: 1.8;
+            margin-bottom: 40px;
         }
-        #chat-input {
-            color: #e5e7eb;
-            min-height: 28px;
-            max-height: 150px;
+
+        .cta-button {
+            background: linear-gradient(45deg, #00a2ff, #0078d4);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 162, 255, 0.3);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 162, 255, 0.4);
+        }
+
+        /* Chat Section */
+        .chat-section {
+            background: rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .chat-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 162, 255, 0.2);
+            overflow: hidden;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            padding: 20px;
+            background: linear-gradient(90deg, rgba(0, 162, 255, 0.1), rgba(0, 120, 212, 0.1));
+            border-bottom: 1px solid rgba(0, 162, 255, 0.2);
+        }
+
+        .chat-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #00a2ff;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
             overflow-y: auto;
-        }
-        #chat-input::placeholder {
-            color: #9ca3af;
-        }
-        #send-btn {
-            background: #f59e0b;
-            color: #1f2937;
-            transition: all 0.3s ease-in-out;
-        }
-        #send-btn:hover {
-            background: #fbbf24;
-            box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
-        /* --- Loading Spinner --- */
-        #loading-indicator .spinner {
-            width: 24px;
-            height: 24px;
-            border: 3px solid rgba(251, 191, 36, 0.3);
-            border-top-color: #f59e0b;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        .message {
+            padding: 15px 20px;
+            border-radius: 15px;
+            max-width: 80%;
+            animation: slideIn 0.3s ease;
+            line-height: 1.6;
         }
 
-        /* --- Output Editor & Controls --- */
-        #lower-section {
-            background-color: rgba(31, 41, 55, 0.8);
+        .user-message {
+            background: linear-gradient(45deg, #00a2ff, #0078d4);
+            align-self: flex-end;
+            color: white;
+        }
+
+        .ai-message {
+            background: rgba(255, 255, 255, 0.1);
+            align-self: flex-start;
+            border: 1px solid rgba(0, 162, 255, 0.2);
+        }
+        
+        .ai-message pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Courier New', Courier, monospace;
+            background-color: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            gap: 15px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 162, 255, 0.3);
+            border-radius: 25px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input:focus {
+            border-color: #00a2ff;
+            box-shadow: 0 0 20px rgba(0, 162, 255, 0.3);
+        }
+
+        .send-button {
+            padding: 15px 25px;
+            background: linear-gradient(45deg, #00a2ff, #0078d4);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .send-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 162, 255, 0.4);
+        }
+
+        /* Editor Section */
+        .editor-section {
+            display: none;
+            background: rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .editor-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 162, 255, 0.2);
+            overflow: hidden;
+        }
+
+        .editor-toolbar {
+            padding: 15px 20px;
+            background: linear-gradient(90deg, rgba(0, 162, 255, 0.1), rgba(0, 120, 212, 0.1));
+            border-bottom: 1px solid rgba(0, 162, 255, 0.2);
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-button {
+            padding: 8px 15px;
+            background: rgba(0, 162, 255, 0.2);
+            border: 1px solid rgba(0, 162, 255, 0.3);
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .toolbar-button:hover {
+            background: rgba(0, 162, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .editor-content {
+            padding: 30px;
+            min-height: 400px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .editor-textarea {
+            width: 100%;
+            min-height: 300px;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            resize: vertical;
+            outline: none;
+            font-family: inherit;
+        }
+
+        /* Features Section */
+        .features-section {
+            background: radial-gradient(ellipse at center, rgba(0, 162, 255, 0.05) 0%, transparent 70%);
+        }
+
+        .features-title {
+            font-size: 3rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 50px;
+            background: linear-gradient(45deg, #ffffff, #00a2ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            border: 1px solid rgba(0, 162, 255, 0.2);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        #output-editor {
-            background-color: #1f2937;
-            border-color: #4b5563;
-            color: #e5e7eb;
-        }
-        #output-editor:focus {
-            border-color: #f59e0b;
-            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
-        }
-        #editor-controls-container {
-            background-color: #374151;
-            border-color: #4b5563;
-        }
-        .editor-btn {
-            background-color: #4b5563;
-            color: #e5e7eb;
-            transition: all 0.2s ease-in-out;
-        }
-        .editor-btn:hover {
-            background-color: #6b7280;
-        }
-        .editor-btn.active {
-            background-color: #f59e0b;
-            color: #1f2937;
-        }
-        .color-input {
-            background-color: #4b5563;
+            transition: all 0.3s ease;
         }
 
-        /* --- General Buttons & Modals --- */
-        .premium-btn {
-            @apply font-semibold py-2 px-6 rounded-full shadow-lg transform transition duration-300 ease-in-out focus:outline-none;
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 162, 255, 0.2);
+            border-color: #00a2ff;
         }
-        .premium-btn-primary {
-            @apply bg-amber-500 hover:bg-amber-400 text-gray-900 focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-gray-800;
+
+        .feature-icon {
+            font-size: 3rem;
+            color: #00a2ff;
+            margin-bottom: 20px;
         }
-        .premium-btn-secondary {
-            @apply bg-gray-600 hover:bg-gray-500 text-gray-100 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-800;
+
+        .feature-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: white;
         }
-        .modal-content {
-            background-color: #1f2937;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+
+        .feature-description {
+            color: #b0b0b0;
+            line-height: 1.6;
         }
-        .close-button {
-            color: #9ca3af;
+
+        /* Footer */
+        .footer {
+            background: rgba(0, 0, 0, 0.8);
+            border-top: 1px solid rgba(0, 162, 255, 0.2);
+            padding: 50px;
+            text-align: center;
         }
-        .close-button:hover {
-            color: #e5e7eb;
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
         }
-        .share-option {
-            background-color: #374151;
-            transition: background-color 0.2s ease;
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
         }
-        .share-option:hover {
-            background-color: #4b5563;
+
+        .footer-link {
+            color: #b0b0b0;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-link:hover {
+            color: #00a2ff;
+        }
+
+        .footer-text {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 162, 255, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(0, 162, 255, 0.6); }
+        }
+
+        .glow-effect {
+            animation: glow 2s infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 20px;
+            }
+            
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .section {
+                padding: 80px 20px 30px;
+            }
+            
+            .nav-menu {
+                gap: 15px;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
-<body class="text-gray-200 flex flex-col min-h-screen">
-    
-    <div class="container mx-auto p-4 md:p-8 flex-grow flex flex-col">
-        <section id="chat-container" class="rounded-xl shadow-2xl flex-grow flex flex-col h-[80vh] max-h-[85vh]">
-            <div class="p-4 border-b border-gray-700">
-                <h1 class="text-2xl font-bold text-center text-amber-400">DeepSEO AI</h1>
-                <p class="text-center text-sm text-gray-400 font-light">Describe the content you wish to create.</p>
-            </div>
+<body>
+    <header class="header">
+        <div class="logo">Serphi AI</div>
+        <nav class="nav-menu">
+            <a href="#about" class="nav-item">About</a>
+            <a href="#feedback" class="nav-item">Feedback</a>
+        </nav>
+    </header>
 
-            <div id="chat-messages" class="flex-grow p-6 overflow-y-auto">
-                <div class="bot-message">
-                    <p>Welcome. I am the DeepSEO AI assistant. How may I assist you today?</p>
-                </div>
-            </div>
+    <div class="main-container">
+        <section class="section hero-section">
+            <h1 class="hero-title">Serphi AI</h1>
+            <p class="hero-subtitle">The AI Built for Helping Thousands of Content Writers</p>
+            <p class="hero-description">
+                Create humanized content that resonates with your audience. Our advanced AI technology transforms your ideas into engaging, plagiarism-free content that's optimized for search engines and designed to connect with readers on a human level.
+            </p>
+            <button class="cta-button" onclick="scrollToChat()">Start Creating</button>
+        </section>
 
-            <div id="chat-input-area" class="p-4">
-                <div id="loading-indicator" class="hidden items-center justify-center text-gray-400 mb-2">
-                    <div class="spinner"></div>
-                    <p class="text-sm ml-3" id="loading-message">Thinking...</p>
+        <section class="section chat-section" id="chat-section">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <div class="chat-title">Chat with Serphi AI</div>
                 </div>
-                <div class="flex items-center border border-gray-600 rounded-lg p-1 focus-within:ring-2 focus-within:ring-amber-500 bg-gray-900/50 transition-all duration-300">
-                    <textarea id="chat-input" placeholder="e.g., Write a persuasive article about the future of renewable energy..." class="w-full px-3 py-2 resize-none border-0 focus:ring-0 bg-transparent" rows="1"></textarea>
-                    <button id="send-btn" class="ml-2 w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-lg shadow-md">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message ai-message">
+                        Hello! I'm Serphi AI, your humanized content creation assistant. I can help you with general conversations or create amazing content for blogs, articles, and more. What would you like to do today?
+                    </div>
+                </div>
+                <div class="chat-input-container">
+                    <input type="text" class="chat-input" id="chatInput" placeholder="Type your message or content request..." onkeypress="handleKeyPress(event)">
+                    <button class="send-button" onclick="sendMessage()">Send</button>
                 </div>
             </div>
         </section>
 
-        <section id="lower-section" class="hidden rounded-xl shadow-2xl mt-8">
-            <div class="p-6">
-                <h2 class="text-3xl font-bold text-center mb-6 text-amber-400">Generated Content</h2>
-            </div>
-            
-            <div id="editor-controls-container" class="hidden">
-                 <div class="flex flex-wrap gap-2 p-3 bg-gray-700/50 border-y border-gray-600">
-                    <button type="button" data-command="bold" class="editor-btn" title="Bold"><i class="fas fa-bold"></i></button>
-                    <button type="button" data-command="italic" class="editor-btn" title="Italic"><i class="fas fa-italic"></i></button>
-                    <button type="button" data-command="underline" class="editor-btn" title="Underline"><i class="fas fa-underline"></i></button>
-                    <button type="button" data-command="strikeThrough" class="editor-btn" title="Strikethrough"><i class="fas fa-strikethrough"></i></button>
-                    <button type="button" data-command="formatBlock" data-value="h2" class="editor-btn" title="Heading 2">H2</button>
-                    <button type="button" data-command="formatBlock" data-value="h3" class="editor-btn" title="Heading 3">H3</button>
-                    <button type="button" data-command="formatBlock" data-value="p" class="editor-btn" title="Paragraph">P</button>
-                    <select id="font-size-select" class="editor-btn cursor-pointer" title="Font Size">
-                        <option value="">Size</option><option value="1">Small</option><option value="2">Normal</option><option value="3">Medium</option><option value="4">Large</option><option value="5">Larger</option><option value="6">Huge</option><option value="7">Giant</option>
-                    </select>
-                    <select id="font-family-select" class="editor-btn cursor-pointer" title="Font Family">
-                        <option value="">Font</option><option value="Arial">Arial</option><option value="Verdana">Verdana</option><option value="Times New Roman">Times</option><option value="Georgia">Georgia</option><option value="Manrope, sans-serif">Manrope</option>
-                    </select>
-                    <input type="color" id="text-color-input" class="color-input" value="#e5e7eb" title="Text Color">
-                    <input type="color" id="background-color-input" class="color-input" value="#374151" title="Highlight Color">
-                    <button type="button" data-command="insertUnorderedList" class="editor-btn" title="Bullet List"><i class="fas fa-list-ul"></i></button>
-                    <button type="button" data-command="insertOrderedList" class="editor-btn" title="Numbered List"><i class="fas fa-list-ol"></i></button>
-                    <button type="button" data-command="undo" class="editor-btn" title="Undo"><i class="fas fa-undo"></i></button>
-                    <button type="button" data-command="redo" class="editor-btn" title="Redo"><i class="fas fa-redo"></i></button>
-                    <button type="button" id="insert-link-btn" class="editor-btn" title="Insert Link"><i class="fas fa-link"></i></button>
+        <section class="section editor-section" id="editor-section">
+            <div class="editor-container">
+                <div class="editor-toolbar">
+                    <button class="toolbar-button" onclick="backToChat()">Back to Chat</button>
+                </div>
+                <div class="editor-content">
+                    <textarea class="editor-textarea" id="editorTextarea" placeholder="Your amazing content will appear here..."></textarea>
                 </div>
             </div>
+        </section>
 
-            <div id="output-editor" contenteditable="true"></div>
-            
-            <div class="flex justify-center gap-4 p-6">
-                <button id="copy-button" class="premium-btn premium-btn-secondary" style="display: none;" disabled>Copy Text</button>
-                <button id="share-button" class="premium-btn premium-btn-primary" style="display: none;" disabled>Share</button>
+        <section class="section features-section">
+            <h2 class="features-title">Why Choose Serphi AI?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3 class="feature-title">AI Free Writing</h3>
+                    <p class="feature-description">Generate unlimited content without restrictions. Our AI adapts to your writing style and preferences.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">✨</div>
+                    <h3 class="feature-title">Plagiarism Free</h3>
+                    <p class="feature-description">Every piece of content is original and unique, ensuring your work stands out from the crowd.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">👤</div>
+                    <h3 class="feature-title">Humanized Content</h3>
+                    <p class="feature-description">Content that feels natural and engaging, written to connect with real people and their emotions.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📈</div>
+                    <h3 class="feature-title">SEO Optimized</h3>
+                    <p class="feature-description">Built-in SEO best practices help your content rank higher and reach more readers.</p>
+                </div>
             </div>
         </section>
     </div>
 
-    <footer class="text-center p-4 mt-auto text-gray-500 font-light">
-        <p>&copy; 2025 DeepSEO AI. All rights reserved.</p>
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#" class="footer-link">Privacy Policy</a>
+                <a href="#" class="footer-link">Terms of Service</a>
+                <a href="#" class="footer-link">Contact Us</a>
+                <a href="#" class="footer-link">Help Center</a>
+                <a href="#" class="footer-link">API Documentation</a>
+            </div>
+            <p class="footer-text">© 2025 Serphi AI. All rights reserved. Empowering content creators worldwide.</p>
+        </div>
     </footer>
 
-    <div id="message-box" class="message-box"></div>
+    <script>
+        // --- START OF MODIFIED BACKEND LOGIC ---
 
-    <div id="share-modal-overlay" class="modal-overlay">
-        <div class="modal-content">
-            <button id="close-share-modal" class="close-button">&times;</button>
-            <h3 class="text-2xl font-bold text-center mb-6 text-amber-400">Share Content</h3>
-            <div class="flex flex-col gap-3">
-                <div class="share-option" data-platform="whatsapp"><i class="fab fa-whatsapp text-green-500"></i> Share on WhatsApp</div>
-                <div class="share-option" data-platform="twitter"><i class="fab fa-twitter text-sky-400"></i> Share on X (Twitter)</div>
-                <div class="share-option" data-platform="linkedin"><i class="fab fa-linkedin text-blue-500"></i> Share on LinkedIn</div>
-                <div class="share-option" data-platform="email"><i class="fas fa-envelope text-gray-400"></i> Share via Email</div>
-            </div>
-        </div>
-    </div>
+        // State management for requirement gathering
+        let isGatheringRequirements = false;
+        let contentRequirements = {};
+        let currentQuestionIndex = 0;
 
-    <script type="module">
-        // --- DATA MAPPINGS (Unchanged) ---
-        const wordLengthMap = {
-            'very-small': { min: 150, max: 300, target: 225 },
-            'small': { min: 300, max: 500, target: 400 },
-            'medium': { min: 500, max: 800, target: 650 },
-            'large': { min: 800, max: 1500, target: 1200 },
-            'very-large': { min: 1500, max: 2500, target: 2000 }
+        // Keywords to detect a user's intent to create content
+        const contentKeywords = [
+            'write', 'create', 'blog', 'article', 'content', 'post', 'essay', 'story', 'paragraph', 
+            'script', 'copy', 'description', 'review', 'tutorial', 'guide', 'newsletter',
+            'social media', 'caption', 'tweet', 'facebook', 'instagram', 'linkedin',
+            'webpage', 'website', 'landing page', 'email', 'letter', 'report', 'generate', 'compose'
+        ];
+
+        // The structured conversation flow for gathering requirements
+        const questions = [
+            { key: 'coreTopic', question: "Great! I can help with that. To start, what is the core topic you'd like me to write about?" },
+            { key: 'contentFormat', question: "Got it. What format should this content be in? For example, a blog post, an email, or a social media caption?" },
+            { key: 'wordLength', question: "Perfect. Approximately how long should the content be? (e.g., 'around 500 words', 'a short paragraph')" },
+            { key: 'writingStyle', question: "Thanks. What writing style should I use? (e.g., 'Conversational', 'Formal', 'Humorous')" },
+            { key: 'keywords', question: "Excellent. Could you please provide a few keywords to include? Please separate them with commas." },
+            { key: 'externalLinks', question: "Almost done! Do you have any external links to include? If not, just say 'no' or 'none'." }
+        ];
+
+        // Casual conversation responses for when not creating content
+        const casualResponses = {
+            greetings: ["Hello there! How can I help you today? 😊", "Hey! What's on your mind?"],
+            howAreYou: ["I'm doing great, thank you! Ready to assist you.", "I'm an AI, so I'm always at 100%! How about you?"],
+            name: ["I'm Serphi AI, your friendly content creation assistant.", "You can call me Serphi AI. It's a pleasure to meet you!"],
+            help: ["I can help you create content like blog posts or articles. Just tell me what you want to create! Or we can just chat."],
+            default: ["That's interesting! Is there any content I can help you create today?", "I see. Let me know if you need help writing anything."]
         };
-        const writingStyleToneMap = new Map([
-            ['Informative', { description: 'Provides useful, factual content; objective tone.', structure: 'Title → Introduction → Subheadings → Bullet Points/Lists → Conclusion/CTA' }],
-            ['Conversational', { description: 'Friendly, casual, human-sounding writing.', structure: 'Hook → Story or Question → Main Points → Light Humor/Examples → CTA' }],
-            ['Educational', { description: 'Designed to teach or explain something step-by-step.', structure: 'Definition → Explanation → Examples → Summary/Exercise/Quiz' }],
-            ['Formal/Professional', { description: 'Objective, structured, business-like.', structure: 'Executive Summary → Sections → Data/Stats → Formal Conclusion' }],
-            ['Persuasive', { description: 'Tries to influence or convince the reader.', structure: 'Problem → Agitate → Solution → Benefits → CTA' }],
-            ['Narrative', { description: 'Tells a story; often personal or brand-driven.', structure: 'Setup → Conflict → Resolution → Moral/CTA' }],
-            ['Descriptive', { description: 'Focuses on detailed imagery or descriptions.', structure: 'Sensory Language → Metaphors → Features → Emotional Hook' }],
-            ['Analytical', { description: 'Breaks down data or trends with reasoning.', structure: 'Thesis → Evidence → Breakdown → Conclusion' }],
-            ['Technical', { description: 'Precise, jargon-heavy, instructional tone.', structure: 'Introduction → Requirements → Step-by-Step Instructions → Troubleshooting' }],
-            ['Expository', { description: 'Explains concepts or ideas neutrally.', structure: 'Topic → Clear Definitions → Logical Sections → Summary' }]
-        ]);
 
-        // --- DOM ELEMENT REFERENCES ---
-        const chatMessages = document.getElementById('chat-messages');
-        const chatInput = document.getElementById('chat-input');
-        const sendBtn = document.getElementById('send-btn');
-        const lowerSection = document.getElementById('lower-section');
-        const outputEditor = document.getElementById('output-editor');
-        const editorControlsContainer = document.getElementById('editor-controls-container');
-        const loadingIndicator = document.getElementById('loading-indicator');
-        const loadingMessage = document.getElementById('loading-message');
-        const copyButton = document.getElementById('copy-button');
-        const shareButton = document.getElementById('share-button');
-        const messageBox = document.getElementById('message-box');
-        const editorButtons = document.querySelectorAll('.editor-btn[data-command]');
-        const fontSizeSelect = document.getElementById('font-size-select');
-        const fontFamilySelect = document.getElementById('font-family-select');
-        const textColorInput = document.getElementById('text-color-input');
-        const backgroundColorInput = document.getElementById('background-color-input');
-        const insertLinkBtn = document.getElementById('insert-link-btn');
-        const shareModalOverlay = document.getElementById('share-modal-overlay');
-        const closeShareModalBtn = document.getElementById('close-share-modal');
-        const shareOptions = document.querySelectorAll('.share-option');
+        // Main function to handle sending a message
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message) return;
 
-        // --- HELPER FUNCTIONS ---
-        function showMessage(message, duration = 3000) {
-            messageBox.textContent = message;
-            messageBox.classList.add('show');
-            setTimeout(() => { messageBox.classList.remove('show'); }, duration);
+            addMessage(message, 'user');
+            input.value = '';
+
+            // Main logic branch: either gather requirements or handle casual chat
+            setTimeout(() => {
+                if (isGatheringRequirements) {
+                    handleRequirementResponse(message);
+                } else {
+                    const intent = detectIntent(message);
+                    if (intent === 'content_creation') {
+                        startRequirementGathering();
+                    } else {
+                        handleCasualConversation(intent);
+                    }
+                }
+            }, 500);
         }
 
-        function executeCommand(command, value = null) {
-            document.execCommand(command, false, value);
-            outputEditor.focus();
+        // Detects if the user wants to create content or just chat
+        function detectIntent(message) {
+            const lowerMessage = message.toLowerCase();
+            if (contentKeywords.some(keyword => lowerMessage.includes(keyword))) {
+                return 'content_creation';
+            }
+            if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) return 'greeting';
+            if (lowerMessage.includes('how are you')) return 'how_are_you';
+            if (lowerMessage.includes('your name') || lowerMessage.includes('who are you')) return 'name';
+            if (lowerMessage.includes('help')) return 'help';
+            return 'casual';
+        }
+
+        // Handles all non-content-creation chat
+        function handleCasualConversation(intent) {
+            let response = '';
+            switch (intent) {
+                case 'greeting': response = casualResponses.greetings[Math.floor(Math.random() * casualResponses.greetings.length)]; break;
+                case 'how_are_you': response = casualResponses.howAreYou[Math.floor(Math.random() * casualResponses.howAreYou.length)]; break;
+                case 'name': response = casualResponses.name[Math.floor(Math.random() * casualResponses.name.length)]; break;
+                case 'help': response = casualResponses.help[Math.floor(Math.random() * casualResponses.help.length)]; break;
+                default: response = casualResponses.default[Math.floor(Math.random() * casualResponses.default.length)];
+            }
+            addMessage(response, 'ai');
+        }
+
+        // Kicks off the requirement gathering process
+        function startRequirementGathering() {
+            isGatheringRequirements = true;
+            contentRequirements = {};
+            currentQuestionIndex = 0;
+            askQuestion();
+        }
+
+        // Asks the next question in the sequence
+        function askQuestion() {
+            if (currentQuestionIndex < questions.length) {
+                const q = questions[currentQuestionIndex];
+                addMessage(q.question, 'ai');
+            }
         }
         
-        function markdownToHtml(markdown) {
-            let html = markdown
-                .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-                .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-                .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-amber-400 hover:underline">$1</a>')
-                .split('\n\n').map(p => p.trim() ? `<p class="my-4">${p.replace(/\n/g, '<br>')}</p>` : '').join('');
+        // Processes the user's answer to a question
+        function handleRequirementResponse(message) {
+            const key = questions[currentQuestionIndex].key;
             
-            html = html.replace(/<p><h1>/g, '<h1>').replace(/<\/h1><\/p>/g, '</h1>');
-            html = html.replace(/<p><h2>/g, '<h2>').replace(/<\/h2><\/p>/g, '</h2>');
-            html = html.replace(/<p><h3>/g, '<h3>').replace(/<\/h3><\/p>/g, '</h3>');
-            return html;
-        }
-
-        // --- CHAT & API LOGIC ---
-        function displayMessage(text, sender) {
-            const messageElement = document.createElement('div');
-            messageElement.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
-            messageElement.innerHTML = sender === 'bot' ? markdownToHtml(text) : text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-            chatMessages.appendChild(messageElement);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        async function callGeminiAPI(prompt, expectJson = false) {
-            const apiKey = "AIzaSyC-nkbK7L2vRtzoRWHLJ3mwsEBBvDxfYjc"; 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
-            
-            const payload = {
-                contents: [{ role: "user", parts: [{ text: prompt }] }]
-            };
-            if (expectJson) {
-                payload.generationConfig = { "response_mime_type": "application/json" };
+            // Sanitize and format the response
+            if (key === 'keywords') {
+                contentRequirements[key] = message.split(',').map(k => k.trim()).filter(k => k);
+            } else if (key === 'externalLinks') {
+                const lowerMessage = message.toLowerCase();
+                if (lowerMessage === 'no' || lowerMessage === 'none') {
+                    contentRequirements[key] = [];
+                } else {
+                    contentRequirements[key] = message.split(/[\s,]+/).map(link => link.trim()).filter(link => link);
+                }
+            } else {
+                contentRequirements[key] = message;
             }
 
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            });
+            currentQuestionIndex++;
 
-            if (!response.ok) {
-                const errorBody = await response.text();
-                throw new Error(`API call failed with status ${response.status}: ${errorBody}`);
-            }
-
-            const result = await response.json();
-            if (!result.candidates || result.candidates.length === 0 || !result.candidates[0].content) {
-                 throw new Error("API returned no content. The prompt may have been blocked.");
-            }
-            return result.candidates[0].content.parts[0].text;
-        }
-
-        async function handleUserMessage() {
-            const userInput = chatInput.value.trim();
-            if (!userInput) return;
-
-            displayMessage(userInput, 'user');
-            chatInput.value = '';
-            chatInput.style.height = 'auto';
-
-            loadingIndicator.style.display = 'flex';
-            sendBtn.disabled = true;
-
-            try {
-                loadingMessage.textContent = 'Analyzing request...';
-                const parsingPrompt = `
-                    Analyze the user request for content generation and extract parameters into a valid JSON object.
-                    Keys: "topic", "articleTitle", "wordLength", "contentFormat", "writingStyleTone", "keywords".
-                    - "wordLength": map to 'very-small', 'small', 'medium', 'large', 'very-large'. Default: 'medium'.
-                    - "contentFormat": map to 'blog', 'article', 'paragraph', etc. Default: 'blog'.
-                    - "writingStyleTone": map to 'Informative', 'Conversational', etc. Default: 'Informative'.
-                    - "keywords": infer a comma-separated list of 5-7 keywords.
-                    User Request: "${userInput}"
-                    JSON Output:`;
-
-                const parsedParamsJson = await callGeminiAPI(parsingPrompt, true);
-                const contentOptions = JSON.parse(parsedParamsJson);
-
-                loadingMessage.textContent = 'Crafting content...';
-                await generateFinalContent(contentOptions);
-            } catch (error) {
-                console.error("Chat handling error:", error);
-                displayMessage(`An error occurred. Please try rephrasing your request. (Details: ${error.message})`, 'bot');
-            } finally {
-                loadingIndicator.style.display = 'none';
-                sendBtn.disabled = false;
+            // If all questions are answered, finalize the process
+            if (currentQuestionIndex >= questions.length) {
+                finishAndOutputJSON();
+            } else {
+                askQuestion();
             }
         }
 
-        async function generateFinalContent(options) {
-            outputEditor.innerHTML = '';
-            editorControlsContainer.classList.add('hidden');
-            lowerSection.classList.add('hidden');
-            copyButton.style.display = 'none';
-            shareButton.style.display = 'none';
+        // Finishes the conversation and outputs the final JSON object
+        function finishAndOutputJSON() {
+            addMessage("All set! Here are the parameters I've gathered. The system will use this to proceed with the content generation.", 'ai');
             
-            const { topic = "Not specified", articleTitle = "", wordLength = "medium", contentFormat = "blog", writingStyleTone = "Informative", keywords = "" } = options;
-            const wordLimitInfo = wordLengthMap[wordLength];
-            const styleToneInfo = writingStyleToneMap.get(writingStyleTone);
+            const jsonOutput = JSON.stringify(contentRequirements, null, 2);
+            const finalJsonMessage = `<pre><code>${jsonOutput}</code></pre>`;
+            addMessage(finalJsonMessage, 'ai', true);
             
-            const promptContent = `As a world-class content strategist and SEO expert, generate exceptional, unique, and human-like content.
-                **Content Requirements:**
-                - **Topic:** "${topic}"
-                ${articleTitle ? `- **Main Article Title (H1):** "${articleTitle}"` : ''}
-                - **Word Count:** Around ${wordLimitInfo.target} words.
-                - **Keywords:** Integrate "${keywords}" naturally.
-                - **Format:** Structure as a "${contentFormat}".
-                - **Style & Tone:** Adopt a "${writingStyleTone}" tone. Use this structure: ${styleToneInfo.structure}.
-                - **Paragraphs:** Keep paragraphs concise (2-4 lines). Use active voice.
-                **Output Format:**
-                - **Format:** Strictly use **Markdown**. Use headings, paragraphs, bolding, lists, and links.
-                - **Meta Description:** At the end, include a compelling meta description (150-160 characters), labeled "Meta Description:".
-            `;
-
-            displayMessage(`Understood. I am now crafting a **${wordLength}** **${contentFormat}** about "**${topic}**" with a **${writingStyleTone}** tone. This may take a moment.`, 'bot');
-
-            const finalMarkdown = await callGeminiAPI(promptContent);
-
-            outputEditor.innerHTML = markdownToHtml(finalMarkdown);
-            lowerSection.classList.remove('hidden');
-            editorControlsContainer.classList.remove('hidden');
-
-            copyButton.disabled = false;
-            shareButton.disabled = false;
-            copyButton.style.display = 'inline-block';
-            shareButton.style.display = 'inline-block';
-
-            displayMessage("Your content is ready for review below.", 'bot');
+            // Reset state for the next conversation
+            isGatheringRequirements = false;
         }
 
-        // --- EVENT LISTENERS SETUP ---
-        function setupEventListeners() {
-            sendBtn.addEventListener('click', handleUserMessage);
-            chatInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleUserMessage();
+        // Utility function to add a message to the chat display
+        function addMessage(text, sender, isHtml = false) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            
+            if (isHtml) {
+                messageDiv.innerHTML = text;
+            } else {
+                messageDiv.textContent = text;
+            }
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // --- END OF MODIFIED BACKEND LOGIC ---
+
+        // --- Original Helper and UI Functions (Unchanged) ---
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function switchToEditor() {
+            document.getElementById('chat-section').style.display = 'none';
+            document.getElementById('editor-section').style.display = 'flex';
+        }
+
+        function backToChat() {
+            document.getElementById('editor-section').style.display = 'none';
+            document.getElementById('chat-section').style.display = 'flex';
+        }
+
+        function scrollToChat() {
+            document.getElementById('chat-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             });
-            chatInput.addEventListener('input', () => {
-                chatInput.style.height = 'auto';
-                chatInput.style.height = `${chatInput.scrollHeight}px`;
-            });
+        });
 
-            editorButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    executeCommand(button.dataset.command, button.dataset.value);
-                });
-            });
-            fontSizeSelect.addEventListener('change', (e) => e.target.value && executeCommand('fontSize', e.target.value));
-            fontFamilySelect.addEventListener('change', (e) => e.target.value && executeCommand('fontName', e.target.value));
-            textColorInput.addEventListener('input', (e) => executeCommand('foreColor', e.target.value));
-            backgroundColorInput.addEventListener('input', (e) => executeCommand('backColor', e.target.value));
-            
-            insertLinkBtn.addEventListener('click', () => {
-                const url = prompt('Enter the URL:');
-                if (url) executeCommand('createLink', url);
-            });
+        // Add particle effect for premium feel
+        function createParticles() {
+            const particlesContainer = document.createElement('div');
+            particlesContainer.style.position = 'fixed';
+            particlesContainer.style.top = '0';
+            particlesContainer.style.left = '0';
+            particlesContainer.style.width = '100%';
+            particlesContainer.style.height = '100%';
+            particlesContainer.style.pointerEvents = 'none';
+            particlesContainer.style.zIndex = '-1'; // Keep particles in the background
+            document.body.insertBefore(particlesContainer, document.body.firstChild);
 
-            copyButton.addEventListener('click', () => {
-                navigator.clipboard.writeText(outputEditor.innerText).then(() => {
-                    showMessage('Content copied to clipboard!');
-                }, () => showMessage('Failed to copy content.'));
-            });
-            shareButton.addEventListener('click', () => shareModalOverlay.classList.add('show'));
-            closeShareModalBtn.addEventListener('click', () => shareModalOverlay.classList.remove('show'));
-            shareModalOverlay.addEventListener('click', (e) => {
-                if(e.target === shareModalOverlay) shareModalOverlay.classList.remove('show');
-            });
-            shareOptions.forEach(option => {
-                option.addEventListener('click', () => {
-                    const platform = option.dataset.platform;
-                    const content = outputEditor.innerText;
-                    const pageUrl = window.location.href;
-                    const shareText = encodeURIComponent(`Check out this DeepSEO content: ${content.substring(0, 150)}... \n\n${pageUrl}`);
-                    const shareTitle = encodeURIComponent("DeepSEO Generated Content");
-                    let url = '';
-                    switch(platform){
-                        case 'whatsapp': url = `https://api.whatsapp.com/send?text=${shareText}`; break;
-                        case 'twitter': url = `https://twitter.com/intent/tweet?text=${shareText}`; break;
-                        case 'linkedin': url = `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(pageUrl)}&title=${shareTitle}&summary=${shareText}`; break;
-                        case 'email': url = `mailto:?subject=${shareTitle}&body=${shareText}`; break;
-                    }
-                    if(url) window.open(url, '_blank');
-                    shareModalOverlay.classList.remove('show');
-                });
-            });
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.style.position = 'absolute';
+                particle.style.width = '2px';
+                particle.style.height = '2px';
+                particle.style.background = 'rgba(0, 162, 255, 0.3)';
+                particle.style.borderRadius = '50%';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animation = `float ${3 + Math.random() * 4}s ease-in-out infinite`;
+                particlesContainer.appendChild(particle);
+            }
         }
         
-        window.onload = setupEventListeners;
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes float {
+                0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0.3; }
+                25% { transform: translateY(-10px) translateX(5px); opacity: 0.8; }
+                50% { transform: translateY(-20px) translateX(-5px); opacity: 0.5; }
+                75% { transform: translateY(-10px) translateX(10px); opacity: 0.8; }
+            }
+        `;
+        document.head.appendChild(style);
+        window.addEventListener('load', createParticles);
     </script>
 </body>
 </html>
