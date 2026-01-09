@@ -37,13 +37,5 @@ The project is built entirely with **HTML, CSS, and Vanilla JavaScript**, requir
 
 ---
 
-##  Getting Started
 
-1. Clone or download this repository  
-2. Open `index.html` in any modern web browser  
-3. Start chatting with **Serphi AI**
-
-> No installation, build process, or backend setup required.
-
----
 
