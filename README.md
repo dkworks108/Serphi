@@ -37,5 +37,34 @@ The project is built entirely with **HTML, CSS, and Vanilla JavaScript**, requir
 
 ---
 
+##  Privacy & Data Handling
+
+- Conversations are stored only in the browser’s localStorage  
+- No server-side storage of user prompts or generated content  
+- Data is sent only during the AI API request  
+
+##  Use Cases
+
+- Content writers & bloggers  
+- Digital marketers & SEO professionals  
+- Students & researchers  
+- Startup founders & businesses  
+
+##  Future Enhancements
+
+- Backend integration  
+- User authentication  
+- Multi-language support  
+- Subscription & usage limits  
+- Admin dashboard  
+
+##  License
+
+© 2025 **Serphi AI**  
+All rights reserved.
+
+##  Project Status
+
+ **AI Project – Launching Soon**
 
 
